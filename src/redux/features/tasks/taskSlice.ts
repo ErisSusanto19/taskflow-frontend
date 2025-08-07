@@ -7,6 +7,9 @@ interface Task {
   completed: boolean;
   unsplashImage?: string;
   quote?: string;
+  description?: string;
+  priority: 'low' | 'medium' | 'high';
+  dueDate?: string;
 }
 
 interface TasksState {
@@ -25,14 +28,6 @@ const taskSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    addTask(state, action: PayloadAction<Omit<Task, 'id'>>) {
-      const newTask = {
-        id: new Date().toISOString(),
-        ...action.payload,
-      };
-      state.tasks.push(newTask);
-    },
-
     toggleTaskCompletion(state, action: PayloadAction<string>) {
       const task = state.tasks.find(t => t.id === action.payload);
       if (task) {
@@ -57,7 +52,11 @@ const taskSlice = createSlice({
     },
 
     setInitialTasks(state, action: PayloadAction<Task[]>) {
-      state.tasks = action.payload;
+      state.tasks = action.payload.map(task => ({
+        ...task,
+        priority: task.priority || 'medium',
+        description: task.description || '',
+      }));
     },
 
     reorderTasks(state, action: PayloadAction<{ startIndex: number; endIndex: number }>) {
@@ -65,9 +64,30 @@ const taskSlice = createSlice({
       const [removed] = state.tasks.splice(startIndex, 1);
       state.tasks.splice(endIndex, 0, removed);
     },
+
+    clearError(state) {
+      state.error = null;
+    },
+
+    editTask(state, action: PayloadAction<{ id: string; updates: Partial<Task> }>) {
+      const task = state.tasks.find(t => t.id === action.payload.id);
+      if (task) {
+        Object.assign(task, action.payload.updates);
+      }
+    },
     
   },
 });
 
-export const { addTask, toggleTaskCompletion, setLoading, setError, deleteTask, setInitialTasks, reorderTasks } = taskSlice.actions;
+export const { 
+  addTaskWithApiSuccess,
+  toggleTaskCompletion, 
+  setLoading, 
+  setError, 
+  deleteTask, 
+  setInitialTasks, 
+  reorderTasks, 
+  clearError,
+  editTask
+} = taskSlice.actions;
 export default taskSlice.reducer;

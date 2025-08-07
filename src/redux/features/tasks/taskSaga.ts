@@ -2,12 +2,14 @@ import { put, call, takeLatest, takeEvery, select } from 'redux-saga/effects';
 import axios from 'axios';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { 
-    addTask, 
+    addTaskWithApiSuccess,
     setLoading, 
     setError,
     toggleTaskCompletion,
     deleteTask,
-    reorderTasks
+    reorderTasks,
+    clearError,
+    editTask
 } from './taskSlice';
 import { RootState } from '@/redux/store';
 
@@ -19,12 +21,15 @@ interface AddTaskWithApiPayload {
   title: string;
   category: string;
   completed: boolean;
+  description?: string;
+  priority: 'low' | 'medium' | 'high';
+  dueDate?: string;
 }
 
 function* fetchApiDataSaga(action: PayloadAction<AddTaskWithApiPayload>) {
   try {
-
-    yield put({ type: 'tasks/setLoading', payload: true });
+    yield put(clearError());
+    yield put(setLoading(true));
 
     const unsplashAccessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
     
@@ -41,11 +46,11 @@ function* fetchApiDataSaga(action: PayloadAction<AddTaskWithApiPayload>) {
       quote: quoteData.q + ' - ' + quoteData.a,
     };
 
-    yield put({ type: 'tasks/addTaskWithApiSuccess', payload: newTask });
+    yield put(addTaskWithApiSuccess(newTask));
   } catch (error) {
-    yield put({ type: 'tasks/setError', payload: 'Gagal mengambil data dari API' });
+    yield put(setError('Gagal mengambil data dari API'));
   } finally {
-    yield put({ type: 'tasks/setLoading', payload: false });
+    yield put(setLoading(false));
   }
 }
 
@@ -73,5 +78,11 @@ export function* taskSaga() {
   yield takeLatest(ADD_TASK_WITH_API_REQUEST, fetchApiDataSaga);
   yield takeLatest(LOAD_TASKS_FROM_LOCAL_STORAGE, loadTasksSaga);
 
-  yield takeEvery([addTask.type, toggleTaskCompletion.type, deleteTask.type, reorderTasks.type], saveTasksSaga);
+  yield takeEvery([
+    addTaskWithApiSuccess.type,
+    toggleTaskCompletion.type, 
+    deleteTask.type, 
+    reorderTasks.type, 
+    editTask.type
+], saveTasksSaga);
 }
