@@ -2,7 +2,7 @@
 
 Taskflow is a feature-rich task management prototype designed for internal use, focusing on a clean user experience, offline-first functionality, and dynamic data integration. This project was built as a case study to demonstrate a modern frontend architecture using Next.js, Redux Toolkit, and Redux Saga.
 
-![Main Interface 1](./assets/MainInterface1.png)
+![Main Interface 1](./assets/MainInterface.png)
 *The main interface of the Taskflow application, displaying a populated list of tasks.*
 
 ---
@@ -82,7 +82,7 @@ Open http://localhost:3000 in your browser to see the application running.
 
 #### Main Interface
 
-![Main Interface 1](./assets/MainInterface1.png)
+![Main Interface 1](./assets/MainInterface.png)
 
 ![Main Interface 2](./assets/MainInterface2.png)
 
