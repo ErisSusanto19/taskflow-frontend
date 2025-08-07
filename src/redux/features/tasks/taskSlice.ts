@@ -51,9 +51,17 @@ const taskSlice = createSlice({
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
+
+    deleteTask(state, action: PayloadAction<string>) {
+      state.tasks = state.tasks.filter(t => t.id !== action.payload);
+    },
+
+    setInitialTasks(state, action: PayloadAction<Task[]>) {
+      state.tasks = action.payload;
+    },
     
   },
 });
 
-export const { addTask, toggleTaskCompletion, setLoading, setError } = taskSlice.actions;
+export const { addTask, toggleTaskCompletion, setLoading, setError, deleteTask, setInitialTasks } = taskSlice.actions;
 export default taskSlice.reducer;

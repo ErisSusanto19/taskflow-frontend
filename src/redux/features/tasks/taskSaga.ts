@@ -1,9 +1,18 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest, takeEvery, select } from 'redux-saga/effects';
 import axios from 'axios';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { log } from 'console';
+import { 
+    addTask, 
+    setLoading, 
+    setError,
+    toggleTaskCompletion,
+    deleteTask
+} from './taskSlice';
+import { RootState } from '@/redux/store';
 
 export const ADD_TASK_WITH_API_REQUEST = 'tasks/addTaskWithApiRequest';
+export const LOAD_TASKS_FROM_LOCAL_STORAGE = 'tasks/loadTasksFromLocalStorage';
+export const SAVE_TASKS_TO_LOCAL_STORAGE = 'tasks/saveTasksToLocalStorage';
 
 interface AddTaskWithApiPayload {
   title: string;
@@ -39,6 +48,29 @@ function* fetchApiDataSaga(action: PayloadAction<AddTaskWithApiPayload>) {
   }
 }
 
+function* loadTasksSaga() {
+  try {
+    const tasks = yield call([localStorage, 'getItem'], 'taskflow_tasks');
+    if (tasks) {
+      yield put({ type: 'tasks/setInitialTasks', payload: JSON.parse(tasks) });
+    }
+  } catch (e) {
+    console.error("Failed to load tasks from local storage", e);
+  }
+}
+
+function* saveTasksSaga() {
+  try {
+    const tasks = yield select((state: RootState) => state.tasks.tasks);
+    yield call([localStorage, 'setItem'], 'taskflow_tasks', JSON.stringify(tasks));
+  } catch (e) {
+    console.error("Failed to save tasks to local storage", e);
+  }
+}
+
 export function* taskSaga() {
   yield takeLatest(ADD_TASK_WITH_API_REQUEST, fetchApiDataSaga);
+  yield takeLatest(LOAD_TASKS_FROM_LOCAL_STORAGE, loadTasksSaga);
+
+  yield takeEvery([addTask.type, toggleTaskCompletion.type, deleteTask.type], saveTasksSaga);
 }

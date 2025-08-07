@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { ADD_TASK_WITH_API_REQUEST } from '@/redux/features/tasks/taskSaga';
+import { ADD_TASK_WITH_API_REQUEST, LOAD_TASKS_FROM_LOCAL_STORAGE } from '@/redux/features/tasks/taskSaga';
 
 import TaskItem from '@/components/TaskItem';
 
@@ -11,6 +11,10 @@ export default function HomePage() {
   const [categoryInput, setCategoryInput] = useState('umum');
   const dispatch = useAppDispatch();
   const { tasks, loading, error }  = useAppSelector((state) => state.tasks);
+
+  useEffect(() => {
+    dispatch({ type: LOAD_TASKS_FROM_LOCAL_STORAGE });
+  }, [dispatch]);
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
