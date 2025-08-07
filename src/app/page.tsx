@@ -154,7 +154,7 @@ export default function HomePage() {
         
         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-4">
-            Pencarian & Fileter Tugas
+            Pencarian & Filter Tugas
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div className="flex flex-col">
