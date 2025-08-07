@@ -6,7 +6,8 @@ import {
     setLoading, 
     setError,
     toggleTaskCompletion,
-    deleteTask
+    deleteTask,
+    reorderTasks
 } from './taskSlice';
 import { RootState } from '@/redux/store';
 
@@ -72,5 +73,5 @@ export function* taskSaga() {
   yield takeLatest(ADD_TASK_WITH_API_REQUEST, fetchApiDataSaga);
   yield takeLatest(LOAD_TASKS_FROM_LOCAL_STORAGE, loadTasksSaga);
 
-  yield takeEvery([addTask.type, toggleTaskCompletion.type, deleteTask.type], saveTasksSaga);
+  yield takeEvery([addTask.type, toggleTaskCompletion.type, deleteTask.type, reorderTasks.type], saveTasksSaga);
 }

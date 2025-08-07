@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { ADD_TASK_WITH_API_REQUEST, LOAD_TASKS_FROM_LOCAL_STORAGE } from '@/redux/features/tasks/taskSaga';
-
+import { reorderTasks } from '@/redux/features/tasks/taskSlice';
 import TaskItem from '@/components/TaskItem';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 export default function HomePage() {
   const [taskInput, setTaskInput] = useState('');
@@ -29,6 +30,19 @@ export default function HomePage() {
       });
       setTaskInput('');
     }
+  };
+
+   const onDragEnd = (result: any) => {
+    if (!result.destination) {
+      return;
+    }
+
+    dispatch(
+      reorderTasks({
+        startIndex: result.source.index,
+        endIndex: result.destination.index,
+      })
+    );
   };
 
   return (
@@ -87,9 +101,34 @@ export default function HomePage() {
             <p className="text-center text-gray-500">Belum ada tugas. Tambahkan yang baru!</p>
           )}
 
-          {tasks.map((task) => (
-            <TaskItem key={task.id} task={task} />
-          ))}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="task-list">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {tasks.map((task, index) => (
+                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            ...provided.draggableProps.style,
+                            marginBottom: '1rem', // Add margin here for spacing
+                            backgroundColor: snapshot.isDragging ? 'rgb(243 244 246)' : 'white',
+                          }}
+                        >
+                          <TaskItem key={task.id} task={task} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+
         </div>
       </div>
     </main>

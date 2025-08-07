@@ -59,9 +59,15 @@ const taskSlice = createSlice({
     setInitialTasks(state, action: PayloadAction<Task[]>) {
       state.tasks = action.payload;
     },
+
+    reorderTasks(state, action: PayloadAction<{ startIndex: number; endIndex: number }>) {
+      const { startIndex, endIndex } = action.payload;
+      const [removed] = state.tasks.splice(startIndex, 1);
+      state.tasks.splice(endIndex, 0, removed);
+    },
     
   },
 });
 
-export const { addTask, toggleTaskCompletion, setLoading, setError, deleteTask, setInitialTasks } = taskSlice.actions;
+export const { addTask, toggleTaskCompletion, setLoading, setError, deleteTask, setInitialTasks, reorderTasks } = taskSlice.actions;
 export default taskSlice.reducer;
